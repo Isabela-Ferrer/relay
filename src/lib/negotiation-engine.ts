@@ -48,6 +48,7 @@ export interface OrchestratorConfig {
   sellerMandate: SellerMandate
   buyerMandate: BuyerMandate
   maxRounds: number
+  initialProposals?: LOIProposal[]
   onEvent: (event: NegotiationEvent) => void
 }
 
@@ -65,7 +66,7 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<void> 
   } = config
 
   const startTime = Date.now()
-  const proposals: LOIProposal[] = []
+  const proposals: LOIProposal[] = [...(config.initialProposals ?? [])]
 
   // Confidential values for leak detection
   const sellerConfidentialValues = [sellerMandate.minPrice]
