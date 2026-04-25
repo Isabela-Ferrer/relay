@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Shield, Zap, TrendingDown, CheckCircle } from "lucide-react"
+import { ArrowRight, TrendingDown, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChaosToOrder } from "@/components/chaos-to-order"
@@ -195,29 +195,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust signals */}
-      <section className="max-w-5xl mx-auto px-6 py-20">
-        <div className="grid grid-cols-3 gap-8">
-          {[
-            { icon: Shield, title: "Privacy-first", desc: "Confidential parameters are server-side only. Never in the shared context." },
-            { icon: Zap, title: "Real-time convergence", desc: "Watch buyer and seller prices converge round by round with live charts." },
-            { icon: CheckCircle, title: "Human checkpoints", desc: "Agents can propose — only humans can accept. Full approval flow built in." },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center flex-shrink-0">
-                <Icon className="h-5 w-5 text-foreground" />
-              </div>
-              <div>
-                <div className="font-semibold text-foreground mb-1">{title}</div>
-                <div className="text-sm text-muted-foreground leading-relaxed">{desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* CTA */}
-      <section className="bg-lime py-20">
+      <section className="bg-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4 text-foreground">See the negotiation in action</h2>
           <p className="text-foreground/70 mb-10 text-lg">
