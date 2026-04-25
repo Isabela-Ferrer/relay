@@ -1,0 +1,168 @@
+"use client"
+
+import { useCallback, useRef, useState } from "react"
+import type { NegotiationEvent } from "@/lib/negotiation-engine"
+import type { LOIProposal } from "@/lib/agents/types"
+import type { NegotiationSummary } from "@/lib/concession"
+
+export type NegotiationStatus = "idle" | "running" | "checkpoint" | "agreed" | "complete" | "error"
+
+export interface NegotiationUIState {
+  status: NegotiationStatus
+  round: number
+  proposals: LOIProposal[]
+  convergenceHistory: { round: number; buyerPrice: number; sellerPrice: number; score: number }[]
+  checkpointReason?: string
+  summary?: NegotiationSummary
+  error?: string
+}
+
+const INITIAL: NegotiationUIState = {
+  status: "idle",
+  round: 0,
+  proposals: [],
+  convergenceHistory: [],
+}
+
+export function useNegotiation() {
+  const [state, setState] = useState<NegotiationUIState>(INITIAL)
+  const esRef = useRef<EventSource | null>(null)
+
+  const start = useCallback((demo = true) => {
+    if (esRef.current) {
+      esRef.current.close()
+    }
+
+    setState({ ...INITIAL, status: "running" })
+
+    // POST to negotiate, then open SSE
+    fetch("/api/negotiate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ demo, maxRounds: 5 }),
+    }).catch(() => {
+      setState(s => ({ ...s, status: "error", error: "Failed to start negotiation" }))
+    })
+
+    // Use GET SSE stream approach — negotiate streams via POST body
+    // Since POST with streaming: use ReadableStream directly
+    startStream(demo, setState, esRef)
+  }, [])
+
+  const reset = useCallback(() => {
+    if (esRef.current) {
+      esRef.current.close()
+      esRef.current = null
+    }
+    setState(INITIAL)
+  }, [])
+
+  return { state, start, reset }
+}
+
+function startStream(
+  demo: boolean,
+  setState: React.Dispatch<React.SetStateAction<NegotiationUIState>>,
+  esRef: React.MutableRefObject<EventSource | null>,
+) {
+  const sessionId = crypto.randomUUID()
+
+  fetch("/api/negotiate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ demo, maxRounds: 5, sessionId }),
+  }).then(async res => {
+    if (!res.ok || !res.body) {
+      setState(s => ({ ...s, status: "error", error: "Negotiation API failed" }))
+      return
+    }
+
+    const reader = res.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ""
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split("\n")
+      buffer = lines.pop() ?? ""
+
+      for (const line of lines) {
+        if (!line.startsWith("data: ")) continue
+        try {
+          const event: NegotiationEvent = JSON.parse(line.slice(6))
+          handleEvent(event, setState)
+        } catch {
+          // skip malformed
+        }
+      }
+    }
+  }).catch(() => {
+    setState(s => ({ ...s, status: "error", error: "Connection lost" }))
+  })
+}
+
+function handleEvent(
+  event: NegotiationEvent,
+  setState: React.Dispatch<React.SetStateAction<NegotiationUIState>>,
+) {
+  setState(prev => {
+    const next = { ...prev, round: event.round }
+
+    if (event.proposal) {
+      next.proposals = [...prev.proposals, event.proposal]
+    }
+
+    if (event.convergenceData && event.proposal) {
+      const existing = prev.convergenceHistory.find(h => h.round === event.round)
+      if (!existing) {
+        next.convergenceHistory = [
+          ...prev.convergenceHistory,
+          {
+            round: event.round,
+            buyerPrice: event.convergenceData.buyerPrice,
+            sellerPrice: event.convergenceData.sellerPrice,
+            score: event.convergenceScore ?? 0,
+          },
+        ]
+      } else {
+        next.convergenceHistory = prev.convergenceHistory.map(h =>
+          h.round === event.round
+            ? {
+                round: event.round,
+                buyerPrice: event.convergenceData!.buyerPrice,
+                sellerPrice: event.convergenceData!.sellerPrice,
+                score: event.convergenceScore ?? h.score,
+              }
+            : h,
+        )
+      }
+    }
+
+    switch (event.type) {
+      case "proposal":
+        next.status = "running"
+        break
+      case "checkpoint":
+        next.status = "checkpoint"
+        next.checkpointReason = event.checkpointReason
+        break
+      case "agreed":
+        next.status = "agreed"
+        next.summary = event.summary
+        break
+      case "complete":
+        next.status = "complete"
+        next.summary = event.summary
+        break
+      case "error":
+        next.status = "error"
+        next.error = event.message
+        break
+    }
+
+    return next
+  })
+}
