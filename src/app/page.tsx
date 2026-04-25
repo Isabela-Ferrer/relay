@@ -68,7 +68,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section className="border-y border-border bg-secondary/50">
+      <section className="border-y border-lime/30 bg-lime/10">
         <div className="max-w-5xl mx-auto px-6 py-14 grid grid-cols-3 gap-8">
           <div className="text-center">
             <div className="text-4xl font-bold text-foreground mb-1">8–10%</div>
