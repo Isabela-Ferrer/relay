@@ -133,6 +133,163 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Deal Timeline */}
+      <section className="max-w-5xl mx-auto px-6 py-24">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold text-foreground mb-4">The deal journey</h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">From preparation to closing — see where Relay transforms the traditional M&A process.</p>
+        </div>
+        
+        <div className="relative">
+          {/* Timeline line */}
+          <div className="absolute left-8 top-0 bottom-0 w-px bg-border" />
+          
+          <div className="space-y-8">
+            {/* Stage 1 */}
+            <div className="relative pl-20">
+              <div className="absolute left-5 w-6 h-6 rounded-full bg-secondary border-2 border-border flex items-center justify-center">
+                <span className="text-xs font-bold text-muted-foreground">1</span>
+              </div>
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-2">Seller Preparation</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  The seller gathers financials, story, and intent. No Relay involvement. Quiet setup before the engine starts.
+                </p>
+              </div>
+            </div>
+
+            {/* Stage 2 - Highlighted */}
+            <div className="relative pl-20">
+              <div className="absolute left-5 w-6 h-6 rounded-full bg-lime border-2 border-lime flex items-center justify-center">
+                <span className="text-xs font-bold text-foreground">2</span>
+              </div>
+              <div className="bg-lime/10 border border-lime/30 rounded-2xl p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="font-semibold text-foreground">Valuation</h3>
+                  <span className="text-xs font-medium bg-lime text-foreground px-2 py-0.5 rounded-full">Relay transforms this</span>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                  The first shift. The fog lifts.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-background/60 rounded-xl p-4">
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Before</div>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      A number pulled from loose comparisons and broker instinct. Confidence is fragile. Logic is hidden.
+                    </p>
+                  </div>
+                  <div className="bg-lime/20 rounded-xl p-4">
+                    <div className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">After</div>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      A structured valuation range grounded in real earnings (SDE). Clear reasoning. Risks surfaced early. The seller now has a position they can defend, not just suggest.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stage 3 */}
+            <div className="relative pl-20">
+              <div className="absolute left-5 w-6 h-6 rounded-full bg-secondary border-2 border-border flex items-center justify-center">
+                <span className="text-xs font-bold text-muted-foreground">3</span>
+              </div>
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-2">Listing & Discovery</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  The business enters the market. Buyers begin circling. Still traditional. Still noisy.
+                </p>
+              </div>
+            </div>
+
+            {/* Stage 4 - Highlighted */}
+            <div className="relative pl-20">
+              <div className="absolute left-5 w-6 h-6 rounded-full bg-lime border-2 border-lime flex items-center justify-center">
+                <span className="text-xs font-bold text-foreground">4</span>
+              </div>
+              <div className="bg-lime/10 border border-lime/30 rounded-2xl p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="font-semibold text-foreground">Buyer Qualification & NDA</h3>
+                  <span className="text-xs font-medium bg-lime text-foreground px-2 py-0.5 rounded-full">Relay transforms this</span>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                  The filter snaps into place.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-background/60 rounded-xl p-4">
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Before</div>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      Curious but unqualified buyers flood in. Time leaks. Sensitive info drifts too early.
+                    </p>
+                  </div>
+                  <div className="bg-lime/20 rounded-xl p-4">
+                    <div className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">After</div>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      Only serious buyers pass through. Capital is confirmed. Intent is clear. Information flows after trust is established, not before.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stage 5 - Highlighted */}
+            <div className="relative pl-20">
+              <div className="absolute left-5 w-6 h-6 rounded-full bg-lime border-2 border-lime flex items-center justify-center">
+                <span className="text-xs font-bold text-foreground">5</span>
+              </div>
+              <div className="bg-lime/10 border border-lime/30 rounded-2xl p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="font-semibold text-foreground">LOI Negotiation</h3>
+                  <span className="text-xs font-medium bg-lime text-foreground px-2 py-0.5 rounded-full">Relay transforms this</span>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                  The core engine. Where chaos becomes choreography.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-background/60 rounded-xl p-4">
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Before</div>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      Fragmented emails. Slow back-and-forth. Negotiation shaped by personality, not structure. Deadlocks with no clear path forward.
+                    </p>
+                  </div>
+                  <div className="bg-lime/20 rounded-xl p-4">
+                    <div className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">After</div>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      Structured, agent-driven negotiation. Each side operates within defined boundaries. Every move is reasoned. Every gap is visible. When stuck, solutions are proposed, not avoided.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stage 6 */}
+            <div className="relative pl-20">
+              <div className="absolute left-5 w-6 h-6 rounded-full bg-secondary border-2 border-border flex items-center justify-center">
+                <span className="text-xs font-bold text-muted-foreground">6</span>
+              </div>
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-2">Due Diligence</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Lawyers and accountants step in. Verification, scrutiny, reality check. Relay steps back. Humans take the wheel.
+                </p>
+              </div>
+            </div>
+
+            {/* Stage 7 */}
+            <div className="relative pl-20">
+              <div className="absolute left-5 w-6 h-6 rounded-full bg-secondary border-2 border-border flex items-center justify-center">
+                <span className="text-xs font-bold text-muted-foreground">7</span>
+              </div>
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-2">Closing</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Final agreements signed. Ownership transfers. The deal crystallizes.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Feature: Information Separation */}
       <section className="bg-sky">
         <div className="max-w-5xl mx-auto px-6 py-24">
