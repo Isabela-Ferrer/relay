@@ -127,7 +127,7 @@ function ProposalCard({ proposal, index }: { proposal: LOIProposal; index: numbe
 
 export default function NegotiatePage() {
   const router = useRouter()
-  const { state, start, reset } = useNegotiation()
+  const { state, start, reset, approveCheckpoint, rejectCheckpoint } = useNegotiation()
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -236,8 +236,21 @@ export default function NegotiatePage() {
                     <h3 className="font-semibold text-zinc-900 mb-1">Human Approval Required</h3>
                     <p className="text-sm text-zinc-600 mb-4">{state.checkpointReason || "An agent has flagged this for review."}</p>
                     <div className="flex gap-2 justify-center">
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">Approve & Continue</Button>
-                      <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">Reject</Button>
+                      <Button
+                        size="sm"
+                        onClick={approveCheckpoint}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                      >
+                        Approve & Continue
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={rejectCheckpoint}
+                        className="text-red-600 border-red-200 hover:bg-red-50"
+                      >
+                        Reject
+                      </Button>
                     </div>
                   </div>
                 )}

@@ -48,13 +48,21 @@ export interface OrchestratorConfig {
   sellerMandate: SellerMandate
   buyerMandate: BuyerMandate
   maxRounds: number
+  startRound?: number
   initialProposals?: LOIProposal[]
   onEvent: (event: NegotiationEvent) => void
 }
 
+export interface NegotiationRunResult {
+  status: "checkpoint" | "agreed" | "complete"
+  proposals: LOIProposal[]
+  round: number
+  checkpointReason?: string
+}
+
 // ─── RUN NEGOTIATION ──────────────────────────────────────────
 
-export async function runNegotiation(config: OrchestratorConfig): Promise<void> {
+export async function runNegotiation(config: OrchestratorConfig): Promise<NegotiationRunResult> {
   const {
     sessionId,
     sellerData,
@@ -65,6 +73,7 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<void> 
     onEvent,
   } = config
 
+  const startRound = config.startRound ?? 1
   const startTime = Date.now()
   const proposals: LOIProposal[] = [...(config.initialProposals ?? [])]
 
@@ -72,7 +81,7 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<void> 
   const sellerConfidentialValues = [sellerMandate.minPrice]
   const buyerConfidentialValues = [buyerMandate.maxPrice]
 
-  for (let round = 1; round <= maxRounds; round++) {
+  for (let round = startRound; round <= maxRounds; round++) {
 
     // Build shared state (proposals only — NO confidential data from either side)
     const sharedState: NegotiationState = {
@@ -96,7 +105,7 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<void> 
     // ─── BUYER TURN ─────────────────────────────────────
     const lastSellerProposal = [...proposals].reverse().find(p => p.proposingParty === "seller") || null
 
-    let buyerResult = await callWithRetry(
+    const buyerResult = await callWithRetry(
       () => runBuyerAgent({
         sessionId,
         negotiationState: sharedState,
@@ -127,11 +136,15 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<void> 
 
     if (buyerResult.proposal.status === "accepted") {
       emitFinal("agreed", proposals, sellerMandate, buyerMandate, startTime, round, onEvent)
-      return
+      return { status: "agreed", proposals, round }
     }
     if (buyerResult.requiresHumanReview) {
-      emitFinal("complete", proposals, sellerMandate, buyerMandate, startTime, round, onEvent)
-      return
+      return {
+        status: "checkpoint",
+        proposals,
+        round,
+        checkpointReason: buyerResult.escalationReason || undefined,
+      }
     }
 
     // ─── SELLER TURN ────────────────────────────────────
@@ -141,7 +154,7 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<void> 
     sharedState.proposals = [...proposals]
     sharedState.convergenceScore = calculateConvergenceScore(proposals, sellerMandate.askingPrice)
 
-    let sellerResult = await callWithRetry(
+    const sellerResult = await callWithRetry(
       () => runSellerAgent({
         sessionId,
         negotiationState: sharedState,
@@ -171,11 +184,15 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<void> 
 
     if (sellerResult.proposal.status === "accepted") {
       emitFinal("agreed", proposals, sellerMandate, buyerMandate, startTime, round, onEvent)
-      return
+      return { status: "agreed", proposals, round }
     }
     if (sellerResult.requiresHumanReview) {
-      emitFinal("complete", proposals, sellerMandate, buyerMandate, startTime, round, onEvent)
-      return
+      return {
+        status: "checkpoint",
+        proposals,
+        round,
+        checkpointReason: sellerResult.escalationReason || undefined,
+      }
     }
 
     // ─── DEADLOCK CHECK ─────────────────────────────────
@@ -189,12 +206,13 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<void> 
         message: `Negotiation stalled. Parties are $${gapAnalysis.priceGap.toLocaleString()} apart.`,
       })
       emitFinal("complete", proposals, sellerMandate, buyerMandate, startTime, round, onEvent)
-      return
+      return { status: "complete", proposals, round }
     }
   }
 
   // Max rounds reached
   emitFinal("complete", proposals, sellerMandate, buyerMandate, startTime, maxRounds, onEvent)
+  return { status: "complete", proposals, round: maxRounds }
 }
 
 // ─── EMIT FINAL SUMMARY ──────────────────────────────────────
