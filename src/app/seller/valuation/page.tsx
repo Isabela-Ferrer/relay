@@ -145,9 +145,9 @@ export default function ValuationPage() {
         </div>
 
         {/* Mandate setup call-to-action */}
-        <div className="bg-foreground text-background rounded-2xl p-8">
-          <h2 className="text-xl font-bold mb-2">Ready to set your mandate?</h2>
-          <p className="text-background/60 text-sm mb-6 leading-relaxed">
+        <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
+          <h2 className="text-xl font-bold text-foreground mb-2">Ready to set your mandate?</h2>
+          <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
             Your mandate defines your private negotiation floor: minimum acceptable price, earnout tolerance, and hard no&apos;s. The AI agent uses this to negotiate on your behalf — but buyers never see these parameters.
           </p>
           <div className="grid grid-cols-3 gap-3 mb-6 text-sm">
@@ -156,9 +156,9 @@ export default function ValuationPage() {
               { label: "Ask price (public)", value: fmtK(Math.round(valuation.range.mid * 1.05)) },
               { label: "Ideal structure", value: "Flexible" },
             ].map(item => (
-              <div key={item.label} className="bg-background/10 rounded-xl p-3">
-                <div className="text-background/50 text-xs mb-1">{item.label}</div>
-                <div className="font-semibold">{item.value}</div>
+              <div key={item.label} className="bg-secondary rounded-xl p-3">
+                <div className="text-muted-foreground text-xs mb-1">{item.label}</div>
+                <div className="font-semibold text-foreground">{item.value}</div>
               </div>
             ))}
           </div>
