@@ -186,14 +186,14 @@ export default function HomePage() {
                   }`}>
                     <div className={`rounded-xl p-4 shadow-lg text-sm leading-relaxed ${
                       stage.highlight 
-                        ? "bg-lime/10 border border-lime/30 text-foreground" 
-                        : "bg-card border border-border text-muted-foreground"
+                        ? "bg-lime border border-lime text-foreground" 
+                        : "bg-card border border-border text-foreground"
                     }`}>
                       {stage.desc}
                     </div>
                     {/* Arrow */}
                     <div className={`absolute left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 ${
-                      stage.highlight ? "bg-lime/10 border-lime/30" : "bg-card border-border"
+                      stage.highlight ? "bg-lime border-lime" : "bg-card border-border"
                     } ${isAbove ? "-bottom-1.5 border-b border-r" : "-top-1.5 border-l border-t"}`} />
                   </div>
                 </div>
