@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2, XCircle } from "lucide-react"
 
+const parseCurrency = (v: string) => Number(v.replace(/[^0-9.]/g, "")) || 0
+
 export default function BuyerQualifyPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -18,56 +20,48 @@ export default function BuyerQualifyPage() {
   const [form, setForm] = useState({
     organizationName: "",
     buyerType: "individual",
-    investmentThesis: "",
+    operationalBackground: "",
     targetIndustries: "B2B SaaS, Logistics Tech",
     geographicFocus: "United States",
-    revenueMin: "500000",
-    revenueMax: "5000000",
-    ebitdaMin: "200000",
-    ebitdaMax: "2000000",
-    checkMin: "1000000",
-    checkMax: "4000000",
+    availableCapital: "",
+    sbaPrequalified: "no",
+    sbaPrequalAmount: "",
+    maxPrice: "",
+    timelineToClose: "6",
+    preferredStructure: "flexible",
+    earnoutAppetite: "moderate",
+    dueDiligenceTimeNeeded: "60",
+    exclusivityPeriod: "90",
     contactName: "",
     contactEmail: "",
-    financingCapacity: "",
   })
 
-  const set = (k: string, v: string | null) => setForm(f => ({ ...f, [k]: v ?? "" }))
+  const set = (k: string, v: string | null | undefined) => setForm(f => ({ ...f, [k]: v ?? "" }))
 
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      // Simulate qualification logic
-      const checkMin = Number(form.checkMin)
+      const availableCapital = parseCurrency(form.availableCapital)
       const askingPrice = 3_780_000 // CloudTrack Pro demo
-      const capitalRatio = checkMin / askingPrice
+      const capitalRatio = availableCapital / askingPrice
       const passed = capitalRatio >= 0.3
 
-      // Save buyer profile
       const profile = {
         id: crypto.randomUUID(),
         organizationName: form.organizationName,
         buyerType: form.buyerType,
-        investmentThesis: form.investmentThesis,
+        operationalBackground: form.operationalBackground,
         targetIndustries: form.targetIndustries.split(",").map(s => s.trim()),
         geographicFocus: form.geographicFocus.split(",").map(s => s.trim()),
-        acquisitionCriteria: {
-          revenueMin: Number(form.revenueMin),
-          revenueMax: Number(form.revenueMax),
-          ebitdaMin: Number(form.ebitdaMin),
-          ebitdaMax: Number(form.ebitdaMax),
-          employeeCountMin: 5,
-          employeeCountMax: 50,
-          preferredDealStructures: ["asset_sale", "stock_sale"] as const,
-        },
-        checkSize: {
-          min: Number(form.checkMin),
-          max: Number(form.checkMax),
-          currency: "USD",
-        },
-        holdingPeriod: "Indefinite",
-        synergies: [],
-        previousAcquisitions: 0,
+        availableCapital,
+        sbaPrequalified: form.sbaPrequalified === "yes",
+        sbaPrequalAmount: form.sbaPrequalAmount ? parseCurrency(form.sbaPrequalAmount) : null,
+        maxPrice: form.maxPrice ? parseCurrency(form.maxPrice) : null,
+        preferredStructure: form.preferredStructure,
+        earnoutAppetite: form.earnoutAppetite,
+        timelineToClose: Number(form.timelineToClose),
+        dueDiligenceTimeNeeded: Number(form.dueDiligenceTimeNeeded),
+        exclusivityPeriod: Number(form.exclusivityPeriod),
         qualificationStatus: passed ? "qualified" : "disqualified",
         ndasigned: false,
         contactName: form.contactName,
@@ -80,7 +74,7 @@ export default function BuyerQualifyPage() {
         score: passed ? 78 : 42,
         reason: passed
           ? "Financial capacity verified. Target industry aligns with available deal. Strategic fit confirmed."
-          : "Check size may be insufficient relative to the asking price. Consider increasing your stated acquisition budget.",
+          : "Available capital may be insufficient relative to the asking price (minimum 30% required per SBA guidelines). Consider increasing your stated acquisition budget.",
       })
     } finally {
       setLoading(false)
@@ -136,14 +130,15 @@ export default function BuyerQualifyPage() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-foreground mb-2">Buyer Qualification</h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Tell us about your acquisition criteria. We&apos;ll automatically screen your fit for available deals. Qualified buyers receive the full CIM.
+            Tell us about your acquisition profile. Qualified buyers receive the full CIM after NDA execution.
           </p>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8 space-y-5 shadow-sm">
+          {/* Identity */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Organization Name *</Label>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Organization / Name *</Label>
               <Input value={form.organizationName} onChange={e => set("organizationName", e.target.value)} placeholder="Apex Growth Partners" className="rounded-xl" />
             </div>
             <div>
@@ -160,43 +155,136 @@ export default function BuyerQualifyPage() {
               </Select>
             </div>
           </div>
+
           <div>
-            <Label className="text-xs font-semibold text-foreground mb-1.5 block">Investment Thesis *</Label>
+            <Label className="text-xs font-semibold text-foreground mb-1.5 block">Operational Background *</Label>
             <Textarea
-              value={form.investmentThesis}
-              onChange={e => set("investmentThesis", e.target.value)}
-              placeholder="What types of businesses are you looking to acquire and why?"
+              value={form.operationalBackground}
+              onChange={e => set("operationalBackground", e.target.value)}
+              placeholder="Describe your relevant industry experience, past acquisitions, or operating background..."
               className="h-20 resize-none rounded-xl"
             />
           </div>
+
+          {/* Criteria */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Target Industries</Label>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Industries of Interest</Label>
               <Input value={form.targetIndustries} onChange={e => set("targetIndustries", e.target.value)} placeholder="B2B SaaS, Healthcare" className="rounded-xl" />
             </div>
             <div>
-              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Geographic Focus</Label>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Geography</Label>
               <Input value={form.geographicFocus} onChange={e => set("geographicFocus", e.target.value)} placeholder="United States" className="rounded-xl" />
             </div>
           </div>
-          <div>
-            <Label className="text-xs font-semibold text-foreground mb-2 block">Revenue Range ($ USD)</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <Input value={form.revenueMin} onChange={e => set("revenueMin", e.target.value)} placeholder="Min: 500,000" className="rounded-xl" />
-              <Input value={form.revenueMax} onChange={e => set("revenueMax", e.target.value)} placeholder="Max: 5,000,000" className="rounded-xl" />
+
+          {/* Capital */}
+          <div className="p-3 bg-sky/20 rounded-xl text-xs text-foreground border border-sky/40">
+            SBA guidelines require available capital of at least 30% of the asking price. Self-reported for this demo; production integrates Plaid verification.
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Available Capital * ($)</Label>
+              <Input value={form.availableCapital} onChange={e => set("availableCapital", e.target.value)} placeholder="1,200,000" className="rounded-xl" />
+            </div>
+            <div>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">SBA Pre-qualified?</Label>
+              <Select value={form.sbaPrequalified} onValueChange={v => set("sbaPrequalified", v)}>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          <div>
-            <Label className="text-xs font-semibold text-foreground mb-2 block">Check Size Range ($ USD) *</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <Input value={form.checkMin} onChange={e => set("checkMin", e.target.value)} placeholder="Min: 1,000,000" className="rounded-xl" />
-              <Input value={form.checkMax} onChange={e => set("checkMax", e.target.value)} placeholder="Max: 4,000,000" className="rounded-xl" />
+
+          {form.sbaPrequalified === "yes" && (
+            <div>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">SBA Pre-qual Amount ($)</Label>
+              <Input value={form.sbaPrequalAmount} onChange={e => set("sbaPrequalAmount", e.target.value)} placeholder="2,000,000" className="rounded-xl" />
+            </div>
+          )}
+
+          {/* Deal terms */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Max Price ($)</Label>
+              <Input value={form.maxPrice} onChange={e => set("maxPrice", e.target.value)} placeholder="3,200,000" className="rounded-xl" />
+              <p className="text-xs text-muted-foreground mt-1">Confidential — used only by your agent</p>
+            </div>
+            <div>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Preferred Structure</Label>
+              <Select value={form.preferredStructure} onValueChange={v => set("preferredStructure", v)}>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="flexible">Flexible</SelectItem>
+                  <SelectItem value="asset_sale">Asset Sale</SelectItem>
+                  <SelectItem value="stock_sale">Stock Sale</SelectItem>
+                  <SelectItem value="cash_only">All Cash</SelectItem>
+                  <SelectItem value="sba_7a">SBA 7(a) Financed</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          <div>
-            <Label className="text-xs font-semibold text-foreground mb-1.5 block">Financing Capacity / Pre-qualification</Label>
-            <Input value={form.financingCapacity} onChange={e => set("financingCapacity", e.target.value)} placeholder="SBA 7(a) pre-qualified up to $2M + $500K cash equity" className="rounded-xl" />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Earnout Appetite</Label>
+              <Select value={form.earnoutAppetite} onValueChange={v => set("earnoutAppetite", v)}>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None — all cash at close</SelectItem>
+                  <SelectItem value="low">Low (up to 10%)</SelectItem>
+                  <SelectItem value="moderate">Moderate (10–25%)</SelectItem>
+                  <SelectItem value="high">High (25%+)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Timeline to Close (months)</Label>
+              <Select value={form.timelineToClose} onValueChange={v => set("timelineToClose", v)}>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2">2 months</SelectItem>
+                  <SelectItem value="3">3 months</SelectItem>
+                  <SelectItem value="6">4–6 months</SelectItem>
+                  <SelectItem value="12">6–12 months</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Due Diligence Period (days)</Label>
+              <Select value={form.dueDiligenceTimeNeeded} onValueChange={v => set("dueDiligenceTimeNeeded", v)}>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30">30 days</SelectItem>
+                  <SelectItem value="45">45 days</SelectItem>
+                  <SelectItem value="60">60 days</SelectItem>
+                  <SelectItem value="75">75 days</SelectItem>
+                  <SelectItem value="90">90 days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs font-semibold text-foreground mb-1.5 block">Exclusivity Period (days)</Label>
+              <Select value={form.exclusivityPeriod} onValueChange={v => set("exclusivityPeriod", v)}>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30">30 days</SelectItem>
+                  <SelectItem value="60">60 days</SelectItem>
+                  <SelectItem value="90">90 days</SelectItem>
+                  <SelectItem value="120">120 days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Contact */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs font-semibold text-foreground mb-1.5 block">Contact Name</Label>
@@ -215,7 +303,7 @@ export default function BuyerQualifyPage() {
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={loading || !form.organizationName || !form.buyerType}
+            disabled={loading || !form.organizationName || !form.availableCapital}
             className="gap-2 bg-foreground hover:bg-foreground/90 text-background rounded-full"
           >
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Checking...</> : <>Submit for Review <ArrowRight className="h-4 w-4" /></>}

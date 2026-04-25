@@ -39,13 +39,12 @@ export function calculateValuation(seller: SellerOnboardingData): ValuationResul
   const { financials } = seller
 
   // ─── SDE Calculation ──────────────────────────────────
-  // SDE = EBITDA (approximated) + owner compensation adjustments
-  // Since our type gives us EBITDA directly, we use it as the SDE base
-  const sde = financials.ebitda
+  // SDE = Net Income (most recent year) + Owner Salary + Add-Backs
+  const sde = financials.netIncomeY3 + financials.ownerSalary + financials.addBacks
   const sdeBreakdown = {
-    netIncome: financials.netIncome,
-    ownerCompensation: financials.ebitda - financials.netIncome, // implied add-backs
-    adjustments: 0,
+    netIncome: financials.netIncomeY3,
+    ownerCompensation: financials.ownerSalary,
+    adjustments: financials.addBacks,
   }
 
   // ─── Base Multiple ────────────────────────────────────
@@ -55,28 +54,48 @@ export function calculateValuation(seller: SellerOnboardingData): ValuationResul
   // ─── Adjustments ──────────────────────────────────────
   const adjustments: { factor: string; delta: number; reason: string }[] = []
 
-  // Growth rate
-  if (financials.revenueGrowthRate > 0.30) {
-    adjustments.push({ factor: "High Growth", delta: 0.5, reason: `${(financials.revenueGrowthRate * 100).toFixed(0)}% YoY revenue growth exceeds 30% threshold` })
-  } else if (financials.revenueGrowthRate > 0.15) {
-    adjustments.push({ factor: "Moderate Growth", delta: 0.25, reason: `${(financials.revenueGrowthRate * 100).toFixed(0)}% YoY revenue growth shows healthy trajectory` })
-  } else if (financials.revenueGrowthRate < 0) {
-    adjustments.push({ factor: "Declining Revenue", delta: -0.5, reason: `Revenue declined ${(Math.abs(financials.revenueGrowthRate) * 100).toFixed(0)}% YoY` })
+  // YoY growth from 3-year history
+  const revenueGrowthRate = financials.revenueY2 > 0
+    ? (financials.revenueY3 - financials.revenueY2) / financials.revenueY2
+    : 0
+
+  if (revenueGrowthRate > 0.30) {
+    adjustments.push({ factor: "High Growth", delta: 0.5, reason: `${(revenueGrowthRate * 100).toFixed(0)}% YoY revenue growth exceeds 30% threshold` })
+  } else if (revenueGrowthRate > 0.15) {
+    adjustments.push({ factor: "Moderate Growth", delta: 0.25, reason: `${(revenueGrowthRate * 100).toFixed(0)}% YoY revenue growth shows healthy trajectory` })
+  } else if (revenueGrowthRate < 0) {
+    adjustments.push({ factor: "Declining Revenue", delta: -0.5, reason: `Revenue declined ${(Math.abs(revenueGrowthRate) * 100).toFixed(0)}% YoY` })
   }
 
-  // Gross margin
-  if (financials.grossMargin > 0.70) {
-    adjustments.push({ factor: "Strong Gross Margins", delta: 0.5, reason: `${(financials.grossMargin * 100).toFixed(0)}% gross margin indicates high-quality revenue` })
-  } else if (financials.grossMargin < 0.40) {
-    adjustments.push({ factor: "Low Gross Margins", delta: -0.25, reason: `${(financials.grossMargin * 100).toFixed(0)}% gross margin limits scalability` })
+  // Customer concentration risk
+  if (seller.topCustomerRevenuePercent > 20) {
+    adjustments.push({ factor: "Customer Concentration", delta: -0.5, reason: `Top customer represents ${seller.topCustomerRevenuePercent}% of revenue — exceeds 20% threshold` })
   }
 
-  // EBITDA margin
-  const ebitdaMargin = financials.ebitda / financials.revenue
-  if (ebitdaMargin > 0.25) {
-    adjustments.push({ factor: "Strong Profitability", delta: 0.25, reason: `${(ebitdaMargin * 100).toFixed(0)}% EBITDA margin exceeds industry norms` })
-  } else if (ebitdaMargin < 0.10) {
-    adjustments.push({ factor: "Thin Profitability", delta: -0.25, reason: `${(ebitdaMargin * 100).toFixed(0)}% EBITDA margin leaves little room for error` })
+  // Recurring revenue premium
+  if (seller.recurringRevenuePercent > 80) {
+    adjustments.push({ factor: "High Recurring Revenue", delta: 0.5, reason: `${seller.recurringRevenuePercent}% recurring revenue indicates predictable cash flows` })
+  } else if (seller.recurringRevenuePercent < 20) {
+    adjustments.push({ factor: "Low Recurring Revenue", delta: -0.25, reason: `${seller.recurringRevenuePercent}% recurring revenue adds revenue risk` })
+  }
+
+  // Gross margin from most recent year
+  const grossMargin = financials.revenueY3 > 0
+    ? (financials.revenueY3 - financials.expensesY3) / financials.revenueY3
+    : 0
+
+  if (grossMargin > 0.70) {
+    adjustments.push({ factor: "Strong Gross Margins", delta: 0.5, reason: `${(grossMargin * 100).toFixed(0)}% gross margin indicates high-quality revenue` })
+  } else if (grossMargin < 0.40) {
+    adjustments.push({ factor: "Low Gross Margins", delta: -0.25, reason: `${(grossMargin * 100).toFixed(0)}% gross margin limits scalability` })
+  }
+
+  // SDE margin on revenue
+  const sdeMargin = financials.revenueY3 > 0 ? sde / financials.revenueY3 : 0
+  if (sdeMargin > 0.25) {
+    adjustments.push({ factor: "Strong Profitability", delta: 0.25, reason: `${(sdeMargin * 100).toFixed(0)}% SDE margin exceeds industry norms` })
+  } else if (sdeMargin < 0.10) {
+    adjustments.push({ factor: "Thin Profitability", delta: -0.25, reason: `${(sdeMargin * 100).toFixed(0)}% SDE margin leaves little room for error` })
   }
 
   // Team size as owner-dependency proxy
@@ -84,6 +103,14 @@ export function calculateValuation(seller: SellerOnboardingData): ValuationResul
     adjustments.push({ factor: "Owner Dependency Risk", delta: -0.5, reason: `Only ${seller.employeeCount} employees suggests heavy owner dependency` })
   } else if (seller.employeeCount > 20) {
     adjustments.push({ factor: "Established Team", delta: 0.25, reason: `${seller.employeeCount} employees indicates scalable operations` })
+  }
+
+  // Track record — +0.25x per year beyond 3, capped at +1.0x
+  const currentYear = new Date().getFullYear()
+  const yearsInBusiness = currentYear - seller.foundedYear
+  if (yearsInBusiness > 3) {
+    const trackDelta = Math.min((yearsInBusiness - 3) * 0.25, 1.0)
+    adjustments.push({ factor: "Established Track Record", delta: trackDelta, reason: `${yearsInBusiness} years in business (+${trackDelta.toFixed(2)}x)` })
   }
 
   // Timeline urgency discount
@@ -103,6 +130,14 @@ export function calculateValuation(seller: SellerOnboardingData): ValuationResul
   // ─── Risk Flags ───────────────────────────────────────
   const riskFlags: ValuationResult["riskFlags"] = []
 
+  if (seller.topCustomerRevenuePercent > 20) {
+    riskFlags.push({
+      severity: seller.topCustomerRevenuePercent > 40 ? "high" : "medium",
+      title: "High Customer Concentration",
+      description: `Top customer represents ${seller.topCustomerRevenuePercent}% of revenue. Buyers will discount heavily and may require retention guarantees.`,
+    })
+  }
+
   if (seller.employeeCount < 10) {
     riskFlags.push({
       severity: seller.employeeCount < 5 ? "high" : "medium",
@@ -111,19 +146,27 @@ export function calculateValuation(seller: SellerOnboardingData): ValuationResul
     })
   }
 
-  if (financials.revenueGrowthRate < 0) {
+  if (revenueGrowthRate < 0) {
     riskFlags.push({
       severity: "high",
       title: "Declining Revenue",
-      description: `Revenue declined ${(Math.abs(financials.revenueGrowthRate) * 100).toFixed(0)}% year-over-year. This will significantly impact buyer interest.`,
+      description: `Revenue declined ${(Math.abs(revenueGrowthRate) * 100).toFixed(0)}% year-over-year. This will significantly impact buyer interest.`,
     })
   }
 
-  if (ebitdaMargin < 0.15) {
+  if (sdeMargin < 0.15) {
     riskFlags.push({
       severity: "medium",
       title: "Margin Pressure",
-      description: `EBITDA margin of ${(ebitdaMargin * 100).toFixed(0)}% is below typical acquisition thresholds. Buyers will question scalability.`,
+      description: `SDE margin of ${(sdeMargin * 100).toFixed(0)}% is below typical acquisition thresholds. Buyers will question scalability.`,
+    })
+  }
+
+  if (seller.recurringRevenuePercent < 20) {
+    riskFlags.push({
+      severity: "medium",
+      title: "Low Recurring Revenue",
+      description: `Only ${seller.recurringRevenuePercent}% recurring revenue makes future cash flows less predictable, reducing buyer confidence.`,
     })
   }
 
@@ -182,11 +225,11 @@ export function buildValuationMemo(
       },
       {
         method: "revenue_multiple",
-        value: Math.round(seller.financials.revenue * (ebitdaMultiple * 0.4)),
+        value: Math.round(seller.financials.revenueY3 * (ebitdaMultiple * 0.4)),
         weight: 0.25,
         assumptions: [
-          `${(ebitdaMultiple * 0.4).toFixed(1)}x revenue multiple (derived from EBITDA multiple)`,
-          `Revenue of $${seller.financials.revenue.toLocaleString()}`,
+          `${(ebitdaMultiple * 0.4).toFixed(1)}x revenue multiple (derived from SDE multiple)`,
+          `Revenue of $${seller.financials.revenueY3.toLocaleString()}`,
         ],
       },
       {

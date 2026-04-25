@@ -60,14 +60,21 @@ export interface CIMSection {
 
 export function generateCIM(seller: SellerOnboardingData, valuation: ValuationMemo): CIMSection[] {
   const { financials } = seller
-  const ebitdaMargin = ((financials.ebitda / financials.revenue) * 100).toFixed(0)
-  const grossMarginPct = (financials.grossMargin * 100).toFixed(0)
-  const growthPct = (financials.revenueGrowthRate * 100).toFixed(0)
+  const sde = financials.netIncomeY3 + financials.ownerSalary + financials.addBacks
+  const grossMargin = financials.revenueY3 > 0
+    ? (financials.revenueY3 - financials.expensesY3) / financials.revenueY3
+    : 0
+  const revenueGrowthRate = financials.revenueY2 > 0
+    ? (financials.revenueY3 - financials.revenueY2) / financials.revenueY2
+    : 0
+  const grossMarginPct = (grossMargin * 100).toFixed(0)
+  const growthPct = (revenueGrowthRate * 100).toFixed(0)
+  const sdeMarginPct = financials.revenueY3 > 0 ? ((sde / financials.revenueY3) * 100).toFixed(0) : "0"
 
   return [
     {
       title: "Executive Summary",
-      content: `${seller.companyName} is a ${seller.industry} company headquartered in ${seller.headquarters}, generating $${(financials.revenue / 1_000_000).toFixed(1)}M in annual revenue with $${(financials.ebitda / 1_000).toFixed(0)}K EBITDA. Founded in ${seller.foundedYear}, the company has ${seller.employeeCount} employees and has demonstrated ${growthPct}% year-over-year revenue growth. The indicative valuation range is $${(valuation.range.low / 1_000_000).toFixed(1)}M–$${(valuation.range.high / 1_000_000).toFixed(1)}M.`,
+      content: `${seller.companyName} is a ${seller.industry} ${seller.businessType} headquartered in ${seller.headquarters}, generating $${(financials.revenueY3 / 1_000_000).toFixed(1)}M in annual revenue with $${(sde / 1_000).toFixed(0)}K SDE. Founded in ${seller.foundedYear}, the company has ${seller.employeeCount} employees and ${seller.customerCount} customers, demonstrating ${growthPct}% year-over-year revenue growth. The indicative valuation range is $${(valuation.range.low / 1_000_000).toFixed(1)}M–$${(valuation.range.high / 1_000_000).toFixed(1)}M.`,
     },
     {
       title: "Business Description",
@@ -75,7 +82,7 @@ export function generateCIM(seller: SellerOnboardingData, valuation: ValuationMe
     },
     {
       title: "Financial Overview",
-      content: `Revenue (LTM): $${financials.revenue.toLocaleString()}\nEBITDA (LTM): $${financials.ebitda.toLocaleString()}\nNet Income: $${financials.netIncome.toLocaleString()}\nGross Margin: ${grossMarginPct}%\nEBITDA Margin: ${ebitdaMargin}%\nYoY Revenue Growth: ${growthPct}%`,
+      content: `Revenue (Y1 / Y2 / Y3): $${financials.revenueY1.toLocaleString()} / $${financials.revenueY2.toLocaleString()} / $${financials.revenueY3.toLocaleString()}\nNet Income (Y3): $${financials.netIncomeY3.toLocaleString()}\nOwner Salary: $${financials.ownerSalary.toLocaleString()}\nAdd-Backs: $${financials.addBacks.toLocaleString()}\nSDE: $${sde.toLocaleString()}\nGross Margin: ${grossMarginPct}%\nSDE Margin: ${sdeMarginPct}%\nYoY Revenue Growth (Y2→Y3): ${growthPct}%\nRecurring Revenue: ${seller.recurringRevenuePercent}%`,
     },
     {
       title: "Investment Highlights",
@@ -83,7 +90,7 @@ export function generateCIM(seller: SellerOnboardingData, valuation: ValuationMe
     },
     {
       title: "Growth Opportunities",
-      content: financials.revenueGrowthRate > 0.2
+      content: revenueGrowthRate > 0.2
         ? `The business has demonstrated strong organic growth of ${growthPct}% YoY. Key growth vectors include geographic expansion, product line extension, and enterprise customer acquisition. The ${grossMarginPct}% gross margin provides significant room for reinvestment.`
         : `The business has a stable revenue base with opportunities for growth through market expansion, operational improvements, and strategic investment in sales and marketing.`,
     },
@@ -95,7 +102,7 @@ export function generateCIM(seller: SellerOnboardingData, valuation: ValuationMe
     },
     {
       title: "Reason for Sale",
-      content: seller.motivations.join(". ") + ".",
+      content: seller.reasonForSale,
     },
     {
       title: "Transaction Overview",

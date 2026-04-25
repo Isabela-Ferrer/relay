@@ -12,7 +12,7 @@ export async function POST(req: Request): Promise<Response> {
 
   const sessionId = body.sessionId || crypto.randomUUID()
   const buyer = body.buyerProfile
-  const askingPrice = body.askingPrice || DEMO_SELLER.askingPrice || 3_780_000
+  const askingPrice = body.askingPrice || DEMO_SELLER.targetPrice || 3_780_000
 
   if (!buyer) {
     return Response.json(buildDemoResult(sessionId))
@@ -21,7 +21,7 @@ export async function POST(req: Request): Promise<Response> {
   const criteria: QualificationResult["criteria"] = []
   let totalScore = 0
 
-  const capitalRatio = buyer.checkSize.max / askingPrice
+  const capitalRatio = buyer.availableCapital / askingPrice
   const finScore = capitalRatio >= 1.0 ? 30 : capitalRatio >= 0.5 ? 22 : capitalRatio >= 0.3 ? 15 : 5
   criteria.push({
     criterion: "Financial capacity",
@@ -29,8 +29,8 @@ export async function POST(req: Request): Promise<Response> {
     score: finScore,
     passed: finScore >= 15,
     rationale: capitalRatio >= 0.3
-      ? `Check size of $${buyer.checkSize.max.toLocaleString()} covers ${(capitalRatio * 100).toFixed(0)}% of asking price.`
-      : "Check size insufficient relative to asking price.",
+      ? `Available capital of $${buyer.availableCapital.toLocaleString()} covers ${(capitalRatio * 100).toFixed(0)}% of asking price.`
+      : "Available capital insufficient relative to asking price (minimum 30% required).",
   })
   totalScore += finScore
 
@@ -60,7 +60,7 @@ export async function POST(req: Request): Promise<Response> {
   totalScore += 8
 
   const riskFlags: string[] = []
-  if (buyer.previousAcquisitions === 0) riskFlags.push("No prior acquisition experience")
+  if (!buyer.sbaPrequalified && capitalRatio < 0.5) riskFlags.push("No SBA pre-qualification and capital below 50% of asking price")
   if (capitalRatio < 0.5) riskFlags.push("May require significant external financing")
 
   const result: QualificationResult = {

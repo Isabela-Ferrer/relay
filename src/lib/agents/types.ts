@@ -1,21 +1,35 @@
 export interface SellerOnboardingData {
   companyName: string
   industry: string
+  businessType: string
   description: string
   foundedYear: number
   headquarters: string
   employeeCount: number
+  customerCount: number
   financials: {
-    revenue: number
-    ebitda: number
-    revenueGrowthRate: number
-    grossMargin: number
-    netIncome: number
+    revenueY1: number
+    revenueY2: number
+    revenueY3: number
+    expensesY1: number
+    expensesY2: number
+    expensesY3: number
+    netIncomeY1: number
+    netIncomeY2: number
+    netIncomeY3: number
+    ownerSalary: number
+    addBacks: number
     fiscalYearEnd: string
   }
-  askingPrice: number | null
+  topCustomerRevenuePercent: number
+  recurringRevenuePercent: number
+  reasonForSale: string
+  targetPrice: number | null
+  minimumPrice: number | null
+  transitionWillingness: number
+  sellerNoteTolerance: number
+  earnoutWillingness: "willing" | "conditional" | "unwilling"
   dealStructurePreference: "asset_sale" | "stock_sale" | "merger" | "flexible"
-  motivations: string[]
   timeline: "immediate" | "3_months" | "6_months" | "12_months_plus"
   exclusions: string[]
   confidentialityLevel: "high" | "standard"
@@ -27,26 +41,18 @@ export interface BuyerProfile {
   id: string
   organizationName: string
   buyerType: "strategic" | "financial" | "pe" | "family_office" | "individual"
-  investmentThesis: string
+  operationalBackground: string
   targetIndustries: string[]
   geographicFocus: string[]
-  acquisitionCriteria: {
-    revenueMin: number
-    revenueMax: number
-    ebitdaMin: number
-    ebitdaMax: number
-    employeeCountMin: number
-    employeeCountMax: number
-    preferredDealStructures: ("asset_sale" | "stock_sale" | "merger")[]
-  }
-  checkSize: {
-    min: number
-    max: number
-    currency: string
-  }
-  holdingPeriod: string | null
-  synergies: string[]
-  previousAcquisitions: number
+  availableCapital: number
+  sbaPrequalified: boolean
+  sbaPrequalAmount: number | null
+  maxPrice: number | null
+  preferredStructure: string
+  earnoutAppetite: "none" | "low" | "moderate" | "high"
+  timelineToClose: number
+  dueDiligenceTimeNeeded: number
+  exclusivityPeriod: number
   qualificationStatus: "unqualified" | "in_review" | "qualified" | "disqualified"
   ndasigned: boolean
   contactName: string

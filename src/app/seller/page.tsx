@@ -18,6 +18,12 @@ const INDUSTRIES = [
   "Healthcare", "Manufacturing", "Retail", "Hospitality", "Construction", "Other",
 ]
 
+const BUSINESS_TYPES = [
+  "LLC", "S-Corp", "C-Corp", "Partnership", "Sole Proprietor", "Other",
+]
+
+const parseCurrency = (v: string) => Number(v.replace(/[^0-9.]/g, "")) || 0
+
 export default function SellerOnboarding() {
   const router = useRouter()
   const [step, setStep] = useState(0)
@@ -25,50 +31,70 @@ export default function SellerOnboarding() {
   const [form, setForm] = useState({
     companyName: "",
     industry: "",
+    businessType: "",
     description: "",
-    foundedYear: new Date().getFullYear() - 5,
+    foundedYear: String(new Date().getFullYear() - 5),
     headquarters: "",
-    employeeCount: 10,
-    revenue: "",
-    ebitda: "",
-    netIncome: "",
-    revenueGrowthRate: "",
-    grossMargin: "",
-    askingPrice: "",
-    dealStructurePreference: "flexible",
-    timeline: "6_months",
-    motivations: "",
-    exclusions: "",
+    employeeCount: "10",
+    customerCount: "",
     contactName: "",
     contactEmail: "",
-    confidentialityLevel: "high",
+    revenueY1: "", revenueY2: "", revenueY3: "",
+    expensesY1: "", expensesY2: "", expensesY3: "",
+    netIncomeY1: "", netIncomeY2: "", netIncomeY3: "",
+    ownerSalary: "",
+    addBacks: "",
+    topCustomerRevenuePercent: "",
+    recurringRevenuePercent: "",
+    reasonForSale: "",
+    targetPrice: "",
+    minimumPrice: "",
+    transitionWillingness: "3",
+    sellerNoteTolerance: "20",
+    earnoutWillingness: "conditional",
+    dealStructurePreference: "flexible",
+    timeline: "6_months",
   })
 
-  const set = (k: string, v: string | number | null) => setForm(f => ({ ...f, [k]: v ?? "" }))
+  const set = (k: string, v: string | null | undefined) => setForm(f => ({ ...f, [k]: v ?? "" }))
 
   const buildPayload = (): SellerOnboardingData => ({
     companyName: form.companyName,
     industry: form.industry,
+    businessType: form.businessType,
     description: form.description,
     foundedYear: Number(form.foundedYear),
     headquarters: form.headquarters,
     employeeCount: Number(form.employeeCount),
+    customerCount: Number(form.customerCount),
     financials: {
-      revenue: Number(form.revenue.replace(/[^0-9.]/g, "")),
-      ebitda: Number(form.ebitda.replace(/[^0-9.]/g, "")),
-      netIncome: Number(form.netIncome.replace(/[^0-9.]/g, "")),
-      revenueGrowthRate: Number(form.revenueGrowthRate) / 100,
-      grossMargin: Number(form.grossMargin) / 100,
+      revenueY1: parseCurrency(form.revenueY1),
+      revenueY2: parseCurrency(form.revenueY2),
+      revenueY3: parseCurrency(form.revenueY3),
+      expensesY1: parseCurrency(form.expensesY1),
+      expensesY2: parseCurrency(form.expensesY2),
+      expensesY3: parseCurrency(form.expensesY3),
+      netIncomeY1: parseCurrency(form.netIncomeY1),
+      netIncomeY2: parseCurrency(form.netIncomeY2),
+      netIncomeY3: parseCurrency(form.netIncomeY3),
+      ownerSalary: parseCurrency(form.ownerSalary),
+      addBacks: parseCurrency(form.addBacks),
       fiscalYearEnd: "December",
     },
-    askingPrice: form.askingPrice ? Number(form.askingPrice.replace(/[^0-9.]/g, "")) : null,
+    topCustomerRevenuePercent: Number(form.topCustomerRevenuePercent) || 0,
+    recurringRevenuePercent: Number(form.recurringRevenuePercent) || 0,
+    reasonForSale: form.reasonForSale,
+    targetPrice: form.targetPrice ? parseCurrency(form.targetPrice) : null,
+    minimumPrice: form.minimumPrice ? parseCurrency(form.minimumPrice) : null,
+    transitionWillingness: Number(form.transitionWillingness),
+    sellerNoteTolerance: Number(form.sellerNoteTolerance),
+    earnoutWillingness: form.earnoutWillingness as SellerOnboardingData["earnoutWillingness"],
     dealStructurePreference: form.dealStructurePreference as SellerOnboardingData["dealStructurePreference"],
     timeline: form.timeline as SellerOnboardingData["timeline"],
-    motivations: form.motivations.split(",").map(s => s.trim()).filter(Boolean),
-    exclusions: form.exclusions.split(",").map(s => s.trim()).filter(Boolean),
+    exclusions: [],
+    confidentialityLevel: "high",
     contactName: form.contactName,
     contactEmail: form.contactEmail,
-    confidentialityLevel: form.confidentialityLevel as "high" | "standard",
   })
 
   const handleNext = async () => {
@@ -96,6 +122,13 @@ export default function SellerOnboarding() {
       }
     }
   }
+
+  const currentYear = new Date().getFullYear()
+  const yearLabels = [
+    `${currentYear - 3} (Y1)`,
+    `${currentYear - 2} (Y2)`,
+    `${currentYear - 1} (Y3, most recent)`,
+  ]
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,6 +191,21 @@ export default function SellerOnboarding() {
                   </Select>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Business Type *</Label>
+                  <Select value={form.businessType} onValueChange={v => set("businessType", v)}>
+                    <SelectTrigger className="rounded-xl"><SelectValue placeholder="Legal entity" /></SelectTrigger>
+                    <SelectContent>
+                      {BUSINESS_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Customer Count</Label>
+                  <Input type="number" value={form.customerCount} onChange={e => set("customerCount", e.target.value)} placeholder="250" className="rounded-xl" />
+                </div>
+              </div>
               <div>
                 <Label className="text-xs font-semibold text-foreground mb-1.5 block">Business Description *</Label>
                 <Textarea
@@ -196,33 +244,62 @@ export default function SellerOnboarding() {
 
           {/* Step 1: Financials */}
           {step === 1 && (
-            <div className="space-y-5">
+            <div className="space-y-6">
               <div className="p-3 bg-lime/30 rounded-xl text-xs text-foreground border border-lime/50">
                 Your financial data is encrypted and only used to generate your valuation and agent mandate. It is never shared with buyers directly.
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Annual Revenue (LTM) *</Label>
-                  <Input value={form.revenue} onChange={e => set("revenue", e.target.value)} placeholder="1,200,000" className="rounded-xl" />
-                </div>
-                <div>
-                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">EBITDA (LTM) *</Label>
-                  <Input value={form.ebitda} onChange={e => set("ebitda", e.target.value)} placeholder="480,000" className="rounded-xl" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Net Income</Label>
-                  <Input value={form.netIncome} onChange={e => set("netIncome", e.target.value)} placeholder="360,000" className="rounded-xl" />
-                </div>
-                <div>
-                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Revenue Growth Rate (% YoY)</Label>
-                  <Input type="number" value={form.revenueGrowthRate} onChange={e => set("revenueGrowthRate", e.target.value)} placeholder="40" className="rounded-xl" />
-                </div>
-              </div>
+
+              {/* 3-year financial table */}
               <div>
-                <Label className="text-xs font-semibold text-foreground mb-1.5 block">Gross Margin (%)</Label>
-                <Input type="number" value={form.grossMargin} onChange={e => set("grossMargin", e.target.value)} placeholder="85" className="rounded-xl" />
+                <div className="grid grid-cols-4 gap-3 mb-2">
+                  <div />
+                  {yearLabels.map(y => (
+                    <div key={y} className="text-xs font-semibold text-muted-foreground text-center">{y}</div>
+                  ))}
+                </div>
+                {[
+                  { label: "Revenue *", keys: ["revenueY1", "revenueY2", "revenueY3"] as const, placeholder: "1,200,000" },
+                  { label: "Expenses *", keys: ["expensesY1", "expensesY2", "expensesY3"] as const, placeholder: "720,000" },
+                  { label: "Net Income *", keys: ["netIncomeY1", "netIncomeY2", "netIncomeY3"] as const, placeholder: "480,000" },
+                ].map(row => (
+                  <div key={row.label} className="grid grid-cols-4 gap-3 mb-3 items-center">
+                    <div className="text-xs font-semibold text-foreground">{row.label}</div>
+                    {row.keys.map(k => (
+                      <Input
+                        key={k}
+                        value={form[k]}
+                        onChange={e => set(k, e.target.value)}
+                        placeholder={row.placeholder}
+                        className="rounded-xl text-sm"
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Owner&apos;s Salary *</Label>
+                  <Input value={form.ownerSalary} onChange={e => set("ownerSalary", e.target.value)} placeholder="150,000" className="rounded-xl" />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Add-Backs</Label>
+                  <Input value={form.addBacks} onChange={e => set("addBacks", e.target.value)} placeholder="15,600" className="rounded-xl" />
+                  <p className="text-xs text-muted-foreground mt-1">One-time or non-recurring expenses added back to earnings</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Top Customer Revenue %</Label>
+                  <Input type="number" value={form.topCustomerRevenuePercent} onChange={e => set("topCustomerRevenuePercent", e.target.value)} placeholder="15" className="rounded-xl" />
+                  <p className="text-xs text-muted-foreground mt-1">% of total revenue from your largest customer</p>
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Recurring Revenue %</Label>
+                  <Input type="number" value={form.recurringRevenuePercent} onChange={e => set("recurringRevenuePercent", e.target.value)} placeholder="80" className="rounded-xl" />
+                  <p className="text-xs text-muted-foreground mt-1">% of revenue that is subscription or contract-based</p>
+                </div>
               </div>
             </div>
           )}
@@ -231,10 +308,57 @@ export default function SellerOnboarding() {
           {step === 2 && (
             <div className="space-y-5">
               <div>
-                <Label className="text-xs font-semibold text-foreground mb-1.5 block">Asking Price (optional — AI will suggest)</Label>
-                <Input value={form.askingPrice} onChange={e => set("askingPrice", e.target.value)} placeholder="Leave blank for AI recommendation" className="rounded-xl" />
+                <Label className="text-xs font-semibold text-foreground mb-1.5 block">Reason for Sale *</Label>
+                <Textarea
+                  value={form.reasonForSale}
+                  onChange={e => set("reasonForSale", e.target.value)}
+                  placeholder="Founder retirement, seeking liquidity for next venture..."
+                  className="h-20 resize-none rounded-xl"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Target Price</Label>
+                  <Input value={form.targetPrice} onChange={e => set("targetPrice", e.target.value)} placeholder="3,600,000" className="rounded-xl" />
+                  <p className="text-xs text-muted-foreground mt-1">Your ideal exit value</p>
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Minimum Price</Label>
+                  <Input value={form.minimumPrice} onChange={e => set("minimumPrice", e.target.value)} placeholder="2,800,000" className="rounded-xl" />
+                  <p className="text-xs text-muted-foreground mt-1">Confidential walk-away floor</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Transition Willingness (months)</Label>
+                  <Select value={form.transitionWillingness} onValueChange={v => set("transitionWillingness", v)}>
+                    <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 month</SelectItem>
+                      <SelectItem value="3">3 months</SelectItem>
+                      <SelectItem value="6">6 months</SelectItem>
+                      <SelectItem value="12">12 months</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Seller Note Tolerance (%)</Label>
+                  <Input type="number" value={form.sellerNoteTolerance} onChange={e => set("sellerNoteTolerance", e.target.value)} placeholder="20" className="rounded-xl" />
+                  <p className="text-xs text-muted-foreground mt-1">Max % of deal you&apos;d finance as seller note</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Earnout Willingness</Label>
+                  <Select value={form.earnoutWillingness} onValueChange={v => set("earnoutWillingness", v)}>
+                    <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="willing">Willing</SelectItem>
+                      <SelectItem value="conditional">Conditional (metric-dependent)</SelectItem>
+                      <SelectItem value="unwilling">Unwilling</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div>
                   <Label className="text-xs font-semibold text-foreground mb-1.5 block">Deal Structure Preference</Label>
                   <Select value={form.dealStructurePreference} onValueChange={v => set("dealStructurePreference", v)}>
@@ -247,26 +371,18 @@ export default function SellerOnboarding() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label className="text-xs font-semibold text-foreground mb-1.5 block">Target Timeline</Label>
-                  <Select value={form.timeline} onValueChange={v => set("timeline", v)}>
-                    <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="immediate">Immediate (&lt; 30 days)</SelectItem>
-                      <SelectItem value="3_months">3 months</SelectItem>
-                      <SelectItem value="6_months">6 months</SelectItem>
-                      <SelectItem value="12_months_plus">12+ months</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
               <div>
-                <Label className="text-xs font-semibold text-foreground mb-1.5 block">Reasons for Selling (comma-separated)</Label>
-                <Input value={form.motivations} onChange={e => set("motivations", e.target.value)} placeholder="Founder retirement, seeking liquidity for next venture" className="rounded-xl" />
-              </div>
-              <div>
-                <Label className="text-xs font-semibold text-foreground mb-1.5 block">Asset Exclusions (comma-separated, if any)</Label>
-                <Input value={form.exclusions} onChange={e => set("exclusions", e.target.value)} placeholder="Personal vehicle, IP not related to core product" className="rounded-xl" />
+                <Label className="text-xs font-semibold text-foreground mb-1.5 block">Target Timeline</Label>
+                <Select value={form.timeline} onValueChange={v => set("timeline", v)}>
+                  <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="immediate">Immediate (&lt; 30 days)</SelectItem>
+                    <SelectItem value="3_months">3 months</SelectItem>
+                    <SelectItem value="6_months">6 months</SelectItem>
+                    <SelectItem value="12_months_plus">12+ months</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           )}
