@@ -35,14 +35,14 @@ export default function HomePage() {
           AI Agents & Autonomy Track
         </Badge>
         <h1 className="text-5xl font-bold tracking-tight text-zinc-900 mb-5 max-w-3xl mx-auto leading-tight">
-          Business acquisitions at{" "}
+          Business acquisitions made {" "}
           <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
-            half the cost
+            easy
           </span>
-          {", "}twice the speed
+          {", "}1/3 the cost, 10x the speed
         </h1>
         <p className="text-xl text-zinc-500 mb-8 max-w-2xl mx-auto leading-relaxed">
-          Relay deploys confidential AI agents for both buyer and seller — negotiating LOI terms in real time while keeping each party&apos;s floor price, motivations, and risk concerns completely private.
+          Relay deploys confidential AI agents for both buyer and seller. They negotiating LOI terms in real time while keeping each party&apos;s floor price, motivations, and risk concerns completely private.
         </p>
         <div className="flex items-center justify-center gap-4">
           <Link href="/demo">
@@ -101,8 +101,8 @@ export default function HomePage() {
             {
               step: "02",
               color: "blue",
-              title: "Buyer qualifies & signs NDA",
-              desc: "Buyers submit acquisition criteria and are screened automatically. Qualified buyers receive the CIM — a full confidential information memorandum.",
+              title: "Buyer is onboarded & signs NDA",
+              desc: "Buyers identified by the seller submit acquisition criteria and are screened. Qualified buyers receive the CIM — a full confidential information memorandum.",
               cta: "Qualify as buyer →",
               href: "/buyer/qualify",
             },
@@ -133,16 +133,16 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-16 items-center">
             <div>
               <Badge className="mb-4 bg-emerald-500/20 text-emerald-400 border-emerald-500/30">The Moat</Badge>
-              <h2 className="text-3xl font-bold mb-4">Information separation is the core innovation</h2>
+              <h2 className="text-3xl font-bold mb-4">Information privacy, autonomy, and supervision</h2>
               <p className="text-zinc-400 leading-relaxed mb-6">
-                Traditional brokers represent the seller and must balance competing incentives. Relay&apos;s dual-agent architecture means each party gets a fully confidential AI advocate — never in the same context window.
+                Like traditional brokers, Relay&apos;s dual-agent architecture represent each party's incentives, they are your confidential AI advocate. They help to get your best agreement.
               </p>
               <ul className="space-y-3">
                 {[
-                  "Seller's floor price never sent to buyer agent",
-                  "Buyer's max budget never sent to seller agent",
-                  "Automated leak detection on every LLM call",
+                  "Seller's floor price, buyer's max, and urgency are never revealed",
+                  "Every step is fully transparent; numbers are justified and agent interactions are explainable",
                   "Human checkpoints for approval at key decisions",
+                  "Handoff to partner lawyers and financial institutions to close the deal seamlessly",
                 ].map(item => (
                   <li key={item} className="flex items-center gap-2 text-sm text-zinc-300">
                     <CheckCircle className="h-4 w-4 text-emerald-400 flex-shrink-0" />
