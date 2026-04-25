@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowRight, Shield, Zap, TrendingDown, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { ChaosToOrder } from "@/components/chaos-to-order"
 
 export default function HomePage() {
   return (
@@ -41,6 +42,12 @@ export default function HomePage() {
           </span>
           {", "}1/3 the cost, 10x the speed
         </h1>
+        
+        {/* Chaos to Order illustration */}
+        <div className="w-full max-w-4xl mx-auto mb-10">
+          <ChaosToOrder className="w-full h-auto text-foreground/70" />
+        </div>
+        
         <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
           Relay deploys confidential AI agents for both buyer and seller. They negotiate LOI terms in real time while keeping each party&apos;s floor price, motivations, and risk concerns completely private.
         </p>
