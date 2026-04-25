@@ -144,7 +144,7 @@ export default function HomePage() {
           {/* Timeline line */}
           <div className="absolute top-5 left-0 right-0 h-px bg-border" />
           
-          <div className="flex justify-center gap-16 relative">
+          <div className="flex justify-center gap-16 relative items-center">
             {[
               { num: 1, title: "Preparation", highlight: false, desc: "The seller gathers financials, story, and intent. No Relay involvement. Quiet setup before the engine starts." },
               { num: 2, title: "Valuation", highlight: true, desc: "A structured valuation range grounded in real earnings (SDE). Clear reasoning. Risks surfaced early." },
@@ -153,45 +153,64 @@ export default function HomePage() {
               { num: 5, title: "LOI Negotiation", highlight: true, desc: "Structured, agent-driven negotiation. Each side operates within defined boundaries. Every move is reasoned." },
               { num: 6, title: "Due Diligence", highlight: false, desc: "Lawyers and accountants step in. Verification, scrutiny, reality check. Relay steps back. Humans take the wheel." },
               { num: 7, title: "Closing", highlight: false, desc: "Final agreements signed. Ownership transfers. The deal crystallizes." },
-            ].map((stage) => (
-              <div key={stage.num} className="flex flex-col items-center group relative">
-                {/* Node */}
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-transform group-hover:scale-110 ${
-                  stage.highlight 
-                    ? "bg-lime border-2 border-lime" 
-                    : "bg-secondary border-2 border-border"
-                }`}>
-                  <span className={`text-sm font-bold ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
-                    {stage.num}
-                  </span>
-                </div>
-                
-                {/* Title */}
-                <div className="mt-4 text-center">
-                  <span className={`text-sm font-medium ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
-                    {stage.title}
-                  </span>
-                  {stage.highlight && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-lime mx-auto mt-1.5" />
+            ].map((stage) => {
+              const isAbove = stage.num % 2 === 1; // Odd numbers above, even numbers below
+              return (
+                <div key={stage.num} className="flex flex-col items-center group relative">
+                  {/* Title above (for odd numbers) */}
+                  {isAbove && (
+                    <div className="mb-4 text-center">
+                      <span className={`text-sm font-medium ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
+                        {stage.title}
+                      </span>
+                      {stage.highlight && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-lime mx-auto mt-1.5" />
+                      )}
+                    </div>
                   )}
-                </div>
-                
-                {/* Hover tooltip */}
-                <div className="absolute top-full mt-8 left-1/2 -translate-x-1/2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-20">
-                  <div className={`rounded-xl p-4 shadow-lg text-sm leading-relaxed ${
+                  
+                  {/* Node */}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-transform group-hover:scale-110 ${
                     stage.highlight 
-                      ? "bg-lime/10 border border-lime/30 text-foreground" 
-                      : "bg-card border border-border text-muted-foreground"
+                      ? "bg-lime border-2 border-lime" 
+                      : "bg-secondary border-2 border-border"
                   }`}>
-                    {stage.desc}
+                    <span className={`text-sm font-bold ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
+                      {stage.num}
+                    </span>
                   </div>
-                  {/* Arrow */}
-                  <div className={`absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 ${
-                    stage.highlight ? "bg-lime/10 border-l border-t border-lime/30" : "bg-card border-l border-t border-border"
-                  }`} />
+                  
+                  {/* Title below (for even numbers) */}
+                  {!isAbove && (
+                    <div className="mt-4 text-center">
+                      <span className={`text-sm font-medium ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
+                        {stage.title}
+                      </span>
+                      {stage.highlight && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-lime mx-auto mt-1.5" />
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Hover tooltip */}
+                  <div className={`absolute left-1/2 -translate-x-1/2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-20 ${
+                    isAbove ? "bottom-full mb-16" : "top-full mt-16"
+                  }`}>
+                    <div className={`rounded-xl p-4 shadow-lg text-sm leading-relaxed ${
+                      stage.highlight 
+                        ? "bg-lime/10 border border-lime/30 text-foreground" 
+                        : "bg-card border border-border text-muted-foreground"
+                    }`}>
+                      {stage.desc}
+                    </div>
+                    {/* Arrow */}
+                    <div className={`absolute left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 ${
+                      stage.highlight ? "bg-lime/10 border-lime/30" : "bg-card border-border"
+                    } ${isAbove ? "-bottom-1.5 border-b border-r" : "-top-1.5 border-l border-t"}`} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
