@@ -36,13 +36,13 @@ export default function HomePage() {
           AI Agents & Autonomy Track
         </Badge>
         <h1 className="text-5xl font-bold tracking-tight text-foreground mb-2 max-w-3xl mx-auto leading-tight">
-          Business acquisitions, but{" "}
+          Business acquisitions,<br />but{" "}
           <span className="bg-lime px-2 rounded-lg">
             easy
           </span>.
         </h1>
         <p className="text-2xl font-semibold text-foreground/70 mb-6">
-          1/3 the cost,<br />10x the speed
+          1/3 the cost, 10x the speed
         </p>
         
         {/* Chaos to Order illustration */}
