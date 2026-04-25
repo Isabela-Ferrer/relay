@@ -14,28 +14,28 @@ export const loiProposalSchema = z.object({
   id: z.string(),
   sessionId: z.string(),
   proposingParty: z.enum(["buyer", "seller"]),
-  version: z.number().int().positive(),
+  version: z.number(),
   submittedAt: z.string(),
-  purchasePrice: z.number().positive(),
+  purchasePrice: z.number(),
   priceStructure: z.object({
-    cashAtClose: z.number().nonnegative(),
-    earnout: z.number().nonnegative(),
+    cashAtClose: z.number(),
+    earnout: z.number(),
     earnoutConditions: z.string().nullable(),
-    sellerFinancing: z.number().nonnegative(),
-    rolloverEquity: z.number().nonnegative(),
+    sellerFinancing: z.number(),
+    rolloverEquity: z.number(),
   }),
   dealStructure: z.enum(["asset_sale", "stock_sale", "merger"]),
   exclusivity: z.object({
     requested: z.boolean(),
-    periodDays: z.number().int().positive().nullable(),
+    periodDays: z.number().nullable(),
   }),
-  dueDiligencePeriodDays: z.number().int().positive(),
+  dueDiligencePeriodDays: z.number(),
   closingConditions: z.array(z.string()),
   representationsAndWarranties: z.boolean(),
-  indemnificationCap: z.number().nonnegative().nullable(),
-  nonCompetePeriodMonths: z.number().int().nonnegative().nullable(),
+  indemnificationCap: z.number().nullable(),
+  nonCompetePeriodMonths: z.number().nullable(),
   keyPersonRetention: z.array(z.string()),
-  breakupFee: z.number().nonnegative().nullable(),
+  breakupFee: z.number().nullable(),
   expiresAt: z.string(),
   notes: z.string(),
   status: z.enum([
@@ -48,6 +48,33 @@ export const loiProposalSchema = z.object({
     "escalate",
   ]),
 })
+
+function validateProposalNumericConstraints(proposal: LOIProposal): void {
+  if (proposal.version <= 0) {
+    throw new Error("Invalid proposal: version must be greater than 0")
+  }
+  if (proposal.purchasePrice <= 0) {
+    throw new Error("Invalid proposal: purchasePrice must be greater than 0")
+  }
+  if (proposal.priceStructure.cashAtClose < 0 || proposal.priceStructure.earnout < 0 || proposal.priceStructure.sellerFinancing < 0 || proposal.priceStructure.rolloverEquity < 0) {
+    throw new Error("Invalid proposal: priceStructure amounts must be nonnegative")
+  }
+  if (proposal.exclusivity.periodDays != null && proposal.exclusivity.periodDays <= 0) {
+    throw new Error("Invalid proposal: exclusivity.periodDays must be greater than 0 when set")
+  }
+  if (proposal.dueDiligencePeriodDays <= 0) {
+    throw new Error("Invalid proposal: dueDiligencePeriodDays must be greater than 0")
+  }
+  if (proposal.indemnificationCap != null && proposal.indemnificationCap < 0) {
+    throw new Error("Invalid proposal: indemnificationCap must be nonnegative when set")
+  }
+  if (proposal.nonCompetePeriodMonths != null && proposal.nonCompetePeriodMonths < 0) {
+    throw new Error("Invalid proposal: nonCompetePeriodMonths must be nonnegative when set")
+  }
+  if (proposal.breakupFee != null && proposal.breakupFee < 0) {
+    throw new Error("Invalid proposal: breakupFee must be nonnegative when set")
+  }
+}
 
 export function buildSellerSystemPrompt(mandate: SellerMandate): string {
   const fmt = (n: number) => `$${n.toLocaleString("en-US")}`
@@ -144,6 +171,8 @@ export async function runSellerAgent(
       gateway: { tags: ["feature:seller-agent"] },
     },
   })
+
+  validateProposalNumericConstraints(proposal as LOIProposal)
 
   const session = getSession(sessionId)
   if (session) {
