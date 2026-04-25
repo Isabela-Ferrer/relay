@@ -165,29 +165,29 @@ export default function HomePage() {
                 <span className="ml-2">leak-detection.ts</span>
               </div>
               <div>
-                <span className="text-sky-foreground font-medium">const</span>{" "}
+                <span className="text-amber-500 font-medium">const</span>{" "}
                 <span className="text-foreground">sellerContext</span>{" "}
                 <span className="text-muted-foreground">= </span>
-                <span className="text-foreground/70">encrypt</span>
+                <span className="text-amber-500">encrypt</span>
                 <span className="text-muted-foreground">(mandate)</span>
               </div>
               <div className="text-muted-foreground">// minPrice, urgency, weaknesses</div>
               <div className="mt-2">
-                <span className="text-sky-foreground font-medium">const</span>{" "}
+                <span className="text-amber-500 font-medium">const</span>{" "}
                 <span className="text-foreground">buyerContext</span>{" "}
                 <span className="text-muted-foreground">= </span>
-                <span className="text-foreground/70">encrypt</span>
+                <span className="text-amber-500">encrypt</span>
                 <span className="text-muted-foreground">(mandate)</span>
               </div>
               <div className="text-muted-foreground">// maxPrice, alternatives, risks</div>
-              <div className="mt-3 text-lime-foreground font-medium">// Shared state = proposals only</div>
+              <div className="mt-3 text-amber-500 font-medium">// Shared state = proposals only</div>
               <div>
-                <span className="text-sky-foreground font-medium">const</span>{" "}
+                <span className="text-amber-500 font-medium">const</span>{" "}
                 <span className="text-foreground">shared</span>{" "}
                 <span className="text-muted-foreground">= {"{"} proposals </span>
                 <span className="text-muted-foreground">{"}"}</span>
               </div>
-              <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
+              <div className="mt-3 pt-3 border-t border-border text-xs text-amber-500">
                 Leak detected → re-prompt with warning
               </div>
             </div>
