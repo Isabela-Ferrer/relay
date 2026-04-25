@@ -42,7 +42,7 @@ export default function HomePage() {
           </span>.
         </h1>
         <p className="text-2xl font-semibold text-foreground/70 mb-6">
-          1/3 the cost, 10x the speed
+          1/3 the cost,<br />10x the speed
         </p>
         
         {/* Chaos to Order illustration */}
