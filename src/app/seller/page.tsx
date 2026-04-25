@@ -111,6 +111,7 @@ export default function SellerOnboarding() {
           body: JSON.stringify({ sellerData: payload, sessionId }),
         })
         const memo = await res.json()
+        if (!res.ok) throw new Error(memo?.error || "Valuation API error")
         sessionStorage.setItem("relay_seller_data", JSON.stringify(payload))
         sessionStorage.setItem("relay_valuation", JSON.stringify(memo))
         sessionStorage.setItem("relay_session_id", sessionId)
