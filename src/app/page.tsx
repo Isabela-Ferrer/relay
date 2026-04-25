@@ -144,7 +144,7 @@ export default function HomePage() {
           {/* Timeline line */}
           <div className="absolute top-5 left-0 right-0 h-px bg-border" />
           
-          <div className="flex justify-between relative">
+          <div className="flex justify-center gap-16 relative">
             {[
               { num: 1, title: "Preparation", highlight: false, desc: "The seller gathers financials, story, and intent. No Relay involvement. Quiet setup before the engine starts." },
               { num: 2, title: "Valuation", highlight: true, desc: "A structured valuation range grounded in real earnings (SDE). Clear reasoning. Risks surfaced early." },
