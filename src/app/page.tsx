@@ -135,16 +135,16 @@ export default function HomePage() {
 
       {/* Deal Timeline */}
       <section className="max-w-6xl mx-auto px-6 py-24">
-        <div className="text-center mb-12">
+        <div className="text-center mb-20">
           <h2 className="text-3xl font-bold text-foreground mb-4">The deal journey</h2>
           <p className="text-muted-foreground max-w-xl mx-auto">From preparation to closing — see where Relay transforms the traditional M&A process.</p>
         </div>
         
-        <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute top-5 left-0 right-0 h-px bg-border" />
+        <div className="relative py-12">
+          {/* Timeline line - centered vertically */}
+          <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-px bg-border" />
           
-          <div className="flex justify-center gap-16 relative items-center">
+          <div className="flex justify-center gap-16 relative">
             {[
               { num: 1, title: "Preparation", highlight: false, desc: "The seller gathers financials, story, and intent. No Relay involvement. Quiet setup before the engine starts." },
               { num: 2, title: "Valuation", highlight: true, desc: "A structured valuation range grounded in real earnings (SDE). Clear reasoning. Risks surfaced early." },
@@ -156,18 +156,18 @@ export default function HomePage() {
             ].map((stage) => {
               const isAbove = stage.num % 2 === 1; // Odd numbers above, even numbers below
               return (
-                <div key={stage.num} className="flex flex-col items-center group relative">
-                  {/* Title above (for odd numbers) */}
-                  {isAbove && (
-                    <div className="mb-4 text-center">
-                      <span className={`text-sm font-medium ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
-                        {stage.title}
-                      </span>
-                      {stage.highlight && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-lime mx-auto mt-1.5" />
-                      )}
-                    </div>
-                  )}
+                <div key={stage.num} className="relative group">
+                  {/* Title - positioned absolutely above or below */}
+                  <div className={`absolute left-1/2 -translate-x-1/2 text-center whitespace-nowrap ${
+                    isAbove ? "bottom-full mb-3" : "top-full mt-3"
+                  }`}>
+                    <span className={`text-sm font-medium ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
+                      {stage.title}
+                    </span>
+                    {stage.highlight && (
+                      <div className={`w-1.5 h-1.5 rounded-full bg-lime mx-auto ${isAbove ? "mt-1.5" : "mt-1.5"}`} />
+                    )}
+                  </div>
                   
                   {/* Node */}
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-transform group-hover:scale-110 ${
@@ -180,21 +180,9 @@ export default function HomePage() {
                     </span>
                   </div>
                   
-                  {/* Title below (for even numbers) */}
-                  {!isAbove && (
-                    <div className="mt-4 text-center">
-                      <span className={`text-sm font-medium ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
-                        {stage.title}
-                      </span>
-                      {stage.highlight && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-lime mx-auto mt-1.5" />
-                      )}
-                    </div>
-                  )}
-                  
                   {/* Hover tooltip */}
                   <div className={`absolute left-1/2 -translate-x-1/2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-20 ${
-                    isAbove ? "bottom-full mb-16" : "top-full mt-16"
+                    isAbove ? "bottom-full mb-14" : "top-full mt-14"
                   }`}>
                     <div className={`rounded-xl p-4 shadow-lg text-sm leading-relaxed ${
                       stage.highlight 
