@@ -125,13 +125,13 @@ export default function HomePage() {
       </section>
 
       {/* Feature: Information Separation */}
-      <section className="bg-foreground text-background">
+      <section className="bg-sky">
         <div className="max-w-5xl mx-auto px-6 py-24">
           <div className="grid grid-cols-2 gap-16 items-center">
             <div>
               <Badge className="mb-5 bg-lime text-foreground border-lime rounded-full">The Moat</Badge>
-              <h2 className="text-3xl font-bold mb-5">Information privacy, autonomy, and supervision</h2>
-              <p className="text-background/70 leading-relaxed mb-8">
+              <h2 className="text-3xl font-bold mb-5 text-foreground">Information privacy, autonomy, and supervision</h2>
+              <p className="text-foreground/70 leading-relaxed mb-8">
                 Like traditional brokers, Relay&apos;s dual-agent architecture represent each party&apos;s incentives, they are your confidential AI advocate. They help to get your best agreement.
               </p>
               <ul className="space-y-4">
@@ -141,44 +141,44 @@ export default function HomePage() {
                   "Human checkpoints for approval at key decisions",
                   "Handoff to partner lawyers and financial institutions to close the deal seamlessly",
                 ].map(item => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-background/80">
-                    <CheckCircle className="h-4 w-4 text-lime flex-shrink-0 mt-0.5" />
+                  <li key={item} className="flex items-start gap-3 text-sm text-foreground/80">
+                    <CheckCircle className="h-4 w-4 text-foreground flex-shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-background/10 rounded-2xl p-6 font-mono text-sm space-y-3">
-              <div className="flex items-center gap-2 text-background/50 text-xs mb-4">
-                <div className="w-2 h-2 rounded-full bg-background/30" />
-                <div className="w-2 h-2 rounded-full bg-background/30" />
-                <div className="w-2 h-2 rounded-full bg-background/30" />
+            <div className="bg-card rounded-2xl p-6 font-mono text-sm space-y-3 shadow-sm">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs mb-4">
+                <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
+                <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
+                <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
                 <span className="ml-2">leak-detection.ts</span>
               </div>
               <div>
-                <span className="text-lime">const</span>{" "}
-                <span className="text-background/90">sellerContext</span>{" "}
-                <span className="text-background/50">= </span>
-                <span className="text-background/70">encrypt</span>
-                <span className="text-background/50">(mandate)</span>
+                <span className="text-sky-foreground font-medium">const</span>{" "}
+                <span className="text-foreground">sellerContext</span>{" "}
+                <span className="text-muted-foreground">= </span>
+                <span className="text-foreground/70">encrypt</span>
+                <span className="text-muted-foreground">(mandate)</span>
               </div>
-              <div className="text-background/40">// minPrice, urgency, weaknesses</div>
+              <div className="text-muted-foreground">// minPrice, urgency, weaknesses</div>
               <div className="mt-2">
-                <span className="text-lime">const</span>{" "}
-                <span className="text-background/90">buyerContext</span>{" "}
-                <span className="text-background/50">= </span>
-                <span className="text-background/70">encrypt</span>
-                <span className="text-background/50">(mandate)</span>
+                <span className="text-sky-foreground font-medium">const</span>{" "}
+                <span className="text-foreground">buyerContext</span>{" "}
+                <span className="text-muted-foreground">= </span>
+                <span className="text-foreground/70">encrypt</span>
+                <span className="text-muted-foreground">(mandate)</span>
               </div>
-              <div className="text-background/40">// maxPrice, alternatives, risks</div>
-              <div className="mt-3 text-lime">// Shared state = proposals only</div>
+              <div className="text-muted-foreground">// maxPrice, alternatives, risks</div>
+              <div className="mt-3 text-lime-foreground font-medium">// Shared state = proposals only</div>
               <div>
-                <span className="text-lime">const</span>{" "}
-                <span className="text-background/90">shared</span>{" "}
-                <span className="text-background/50">= {"{"} proposals </span>
-                <span className="text-background/50">{"}"}</span>
+                <span className="text-sky-foreground font-medium">const</span>{" "}
+                <span className="text-foreground">shared</span>{" "}
+                <span className="text-muted-foreground">= {"{"} proposals </span>
+                <span className="text-muted-foreground">{"}"}</span>
               </div>
-              <div className="mt-3 pt-3 border-t border-background/20 text-xs text-background/60">
+              <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
                 Leak detected → re-prompt with warning
               </div>
             </div>

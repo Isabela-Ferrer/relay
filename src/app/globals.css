@@ -39,6 +39,8 @@
   --color-card: var(--card);
   --color-lime: var(--lime);
   --color-lime-foreground: var(--lime-foreground);
+  --color-sky: var(--sky);
+  --color-sky-foreground: var(--sky-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,11 +51,11 @@
 }
 
 :root {
-  /* Clean white background */
-  --background: oklch(0.995 0 0);
+  /* Creamy off-white background */
+  --background: oklch(0.98 0.005 90);
   --foreground: oklch(0.13 0 0);
   
-  /* Cards with subtle off-white */
+  /* Cards pure white for contrast */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.13 0 0);
   
@@ -64,12 +66,12 @@
   --primary: oklch(0.13 0 0);
   --primary-foreground: oklch(1 0 0);
   
-  /* Secondary: Light gray */
-  --secondary: oklch(0.965 0 0);
+  /* Secondary: Light warm gray */
+  --secondary: oklch(0.96 0.003 90);
   --secondary-foreground: oklch(0.13 0 0);
   
-  /* Muted: Soft gray */
-  --muted: oklch(0.965 0 0);
+  /* Muted: Soft warm gray */
+  --muted: oklch(0.96 0.003 90);
   --muted-foreground: oklch(0.5 0 0);
   
   /* Accent: Lime green (matching the inspiration) */
@@ -79,6 +81,10 @@
   /* Lime: Vibrant chartreuse accent color */
   --lime: oklch(0.91 0.19 115);
   --lime-foreground: oklch(0.13 0 0);
+  
+  /* Sky: Soft light blue */
+  --sky: oklch(0.94 0.03 230);
+  --sky-foreground: oklch(0.13 0 0);
   
   --destructive: oklch(0.577 0.245 27.325);
   
