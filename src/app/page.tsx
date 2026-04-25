@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Shield, Zap, TrendingDown, CheckCircle } from "lucide-react"
+import { ArrowRight, TrendingDown, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChaosToOrder } from "@/components/chaos-to-order"
@@ -68,7 +68,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section className="border-y border-border bg-secondary/50">
+      <section className="border-y border-lime/30 bg-lime/10">
         <div className="max-w-5xl mx-auto px-6 py-14 grid grid-cols-3 gap-8">
           <div className="text-center">
             <div className="text-4xl font-bold text-foreground mb-1">8–10%</div>
@@ -130,6 +130,76 @@ export default function HomePage() {
               </Link>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Deal Timeline */}
+      <section className="max-w-6xl mx-auto px-6 py-24">
+        <div className="text-center mb-20">
+          <h2 className="text-3xl font-bold text-foreground mb-4">The deal journey</h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">From preparation to closing — see where Relay transforms the traditional M&A process.</p>
+        </div>
+        
+        <div className="relative py-12">
+          {/* Timeline line - centered vertically */}
+          <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-px bg-border" />
+          
+          <div className="flex justify-center gap-16 relative">
+            {[
+              { num: 1, title: "Preparation", highlight: false, desc: "The seller gathers financials, story, and intent. No Relay involvement. Quiet setup before the engine starts." },
+              { num: 2, title: "Valuation", highlight: true, desc: "A structured valuation range grounded in real earnings (SDE). Clear reasoning. Risks surfaced early." },
+              { num: 3, title: "Listing", highlight: false, desc: "The business enters the market. Buyers begin circling. Still traditional. Still noisy." },
+              { num: 4, title: "Qualification", highlight: true, desc: "Only serious buyers pass through. Capital is confirmed. Intent is clear. Information flows after trust is established." },
+              { num: 5, title: "LOI Negotiation", highlight: true, desc: "Structured, agent-driven negotiation. Each side operates within defined boundaries. Every move is reasoned." },
+              { num: 6, title: "Due Diligence", highlight: false, desc: "Lawyers and accountants step in. Verification, scrutiny, reality check. Relay steps back. Humans take the wheel." },
+              { num: 7, title: "Closing", highlight: false, desc: "Final agreements signed. Ownership transfers. The deal crystallizes." },
+            ].map((stage) => {
+              const isAbove = stage.num % 2 === 1; // Odd numbers above, even numbers below
+              return (
+                <div key={stage.num} className="relative group">
+                  {/* Title - positioned absolutely above or below */}
+                  <div className={`absolute left-1/2 -translate-x-1/2 text-center whitespace-nowrap ${
+                    isAbove ? "bottom-full mb-3" : "top-full mt-3"
+                  }`}>
+                    <span className={`text-sm font-medium ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
+                      {stage.title}
+                    </span>
+                    {stage.highlight && (
+                      <div className={`w-1.5 h-1.5 rounded-full bg-lime mx-auto ${isAbove ? "mt-1.5" : "mt-1.5"}`} />
+                    )}
+                  </div>
+                  
+                  {/* Node */}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-transform group-hover:scale-110 ${
+                    stage.highlight 
+                      ? "bg-lime border-2 border-lime" 
+                      : "bg-secondary border-2 border-border"
+                  }`}>
+                    <span className={`text-sm font-bold ${stage.highlight ? "text-foreground" : "text-muted-foreground"}`}>
+                      {stage.num}
+                    </span>
+                  </div>
+                  
+                  {/* Hover tooltip */}
+                  <div className={`absolute left-1/2 -translate-x-1/2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-20 ${
+                    isAbove ? "bottom-full mb-14" : "top-full mt-14"
+                  }`}>
+                    <div className={`rounded-xl p-4 shadow-lg text-sm leading-relaxed ${
+                      stage.highlight 
+                        ? "bg-lime border border-lime text-foreground" 
+                        : "bg-card border border-border text-foreground"
+                    }`}>
+                      {stage.desc}
+                    </div>
+                    {/* Arrow */}
+                    <div className={`absolute left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 ${
+                      stage.highlight ? "bg-lime border-lime" : "bg-card border-border"
+                    } ${isAbove ? "-bottom-1.5 border-b border-r" : "-top-1.5 border-l border-t"}`} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -195,29 +265,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust signals */}
-      <section className="max-w-5xl mx-auto px-6 py-20">
-        <div className="grid grid-cols-3 gap-8">
-          {[
-            { icon: Shield, title: "Privacy-first", desc: "Confidential parameters are server-side only. Never in the shared context." },
-            { icon: Zap, title: "Real-time convergence", desc: "Watch buyer and seller prices converge round by round with live charts." },
-            { icon: CheckCircle, title: "Human checkpoints", desc: "Agents can propose — only humans can accept. Full approval flow built in." },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center flex-shrink-0">
-                <Icon className="h-5 w-5 text-foreground" />
-              </div>
-              <div>
-                <div className="font-semibold text-foreground mb-1">{title}</div>
-                <div className="text-sm text-muted-foreground leading-relaxed">{desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* CTA */}
-      <section className="bg-lime py-20">
+      <section className="bg-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4 text-foreground">See the negotiation in action</h2>
           <p className="text-foreground/70 mb-10 text-lg">
