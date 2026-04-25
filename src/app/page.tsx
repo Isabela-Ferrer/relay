@@ -35,13 +35,15 @@ export default function HomePage() {
         <Badge variant="secondary" className="mb-6 bg-lime/20 text-foreground border-lime/30 rounded-full px-4 py-1">
           AI Agents & Autonomy Track
         </Badge>
-        <h1 className="text-5xl font-bold tracking-tight text-foreground mb-6 max-w-3xl mx-auto leading-tight text-balance">
-          Business acquisitions made{" "}
+        <h1 className="text-5xl font-bold tracking-tight text-foreground mb-2 max-w-3xl mx-auto leading-tight">
+          Business acquisitions, but{" "}
           <span className="bg-lime px-2 rounded-lg">
             easy
-          </span>
-          {", "}1/3 the cost, 10x the speed
+          </span>.
         </h1>
+        <p className="text-2xl font-semibold text-foreground/70 mb-6">
+          1/3 the cost, 10x the speed
+        </p>
         
         {/* Chaos to Order illustration */}
         <div className="w-full max-w-4xl mx-auto mb-10">
