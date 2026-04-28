@@ -121,6 +121,13 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<Negoti
     buyerResult.proposal.proposingParty = "buyer"
     buyerResult.proposal.sessionId = sessionId
 
+    // Hard threshold: force escalation if buyer exceeds their own max price
+    if (!buyerResult.requiresHumanReview && buyerResult.proposal.purchasePrice > buyerMandate.maxPrice) {
+      buyerResult.requiresHumanReview = true
+      buyerResult.proposal.status = "escalate"
+      buyerResult.escalationReason = `Proposed price $${buyerResult.proposal.purchasePrice.toLocaleString()} exceeds buyer maximum of $${buyerMandate.maxPrice.toLocaleString()} — human approval required`
+    }
+
     proposals.push(buyerResult.proposal)
     const buyerConv = calculateConvergence(proposals)
 
@@ -168,6 +175,13 @@ export async function runNegotiation(config: OrchestratorConfig): Promise<Negoti
     sellerResult.proposal.version = proposals.length + 1
     sellerResult.proposal.proposingParty = "seller"
     sellerResult.proposal.sessionId = sessionId
+
+    // Hard threshold: force escalation if seller goes below their own min price
+    if (!sellerResult.requiresHumanReview && sellerResult.proposal.purchasePrice < sellerMandate.minPrice) {
+      sellerResult.requiresHumanReview = true
+      sellerResult.proposal.status = "escalate"
+      sellerResult.escalationReason = `Proposed price $${sellerResult.proposal.purchasePrice.toLocaleString()} is below seller minimum of $${sellerMandate.minPrice.toLocaleString()} — human approval required`
+    }
 
     proposals.push(sellerResult.proposal)
     const sellerConv = calculateConvergence(proposals)
@@ -263,7 +277,6 @@ async function callWithRetry<T extends { proposal: LOIProposal; requiresHumanRev
       if (leakCheck.leaked) {
         console.warn(`[LEAK DETECTED] ${role} agent: ${leakCheck.matches.join(", ")}`)
         result.proposal.notes = sanitizeReasoning(reasoning, role)
-        // On first leak, sanitize and return. On repeated leaks, still return sanitized.
         return result
       }
 

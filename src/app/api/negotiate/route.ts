@@ -1,5 +1,4 @@
-import type { SellerMandate, BuyerMandate, SellerOnboardingData, BuyerProfile } from "@/lib/agents/types"
-import type { LOIProposal } from "@/lib/agents/types"
+import type { SellerMandate, BuyerMandate, SellerOnboardingData, BuyerProfile, LOIProposal } from "@/lib/agents/types"
 import { runNegotiation, type NegotiationEvent } from "@/lib/negotiation-engine"
 import {
   DEMO_SELLER,
@@ -17,7 +16,8 @@ interface RequestBody {
   sellerMandate?: SellerMandate
   buyerMandate?: BuyerMandate
   maxRounds?: number
-  demo?: boolean // if true, use preset scenario
+  demo?: boolean
+  initialProposals?: LOIProposal[]
 }
 
 interface PendingCheckpoint {
@@ -77,7 +77,6 @@ export async function POST(req: Request): Promise<Response> {
     startRound = pending.round + 1
     pendingCheckpoints.delete(body.sessionId)
   } else {
-    // Use demo data if requested or if mandates are missing
     sessionId = body.sessionId || crypto.randomUUID()
     sellerData = body.demo ? DEMO_SELLER : (body.sellerData || DEMO_SELLER)
     buyerProfile = body.demo ? DEMO_BUYER : (body.buyerProfile || DEMO_BUYER)
@@ -139,13 +138,12 @@ export async function POST(req: Request): Promise<Response> {
 }
 
 export async function GET(req: Request): Promise<Response> {
-  const { searchParams } = new URL(req.url)
-  const sessionId = searchParams.get("sessionId")
+  const url = new URL(req.url)
+  const sessionId = url.searchParams.get("sessionId")
 
   if (!sessionId) {
     return Response.json({ error: "sessionId is required" }, { status: 400 })
   }
 
-  // Return demo state for now
   return Response.json(buildDemoNegotiationState(sessionId))
 }

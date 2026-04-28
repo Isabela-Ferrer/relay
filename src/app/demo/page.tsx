@@ -61,7 +61,7 @@ function MiniProposal({ proposal, index }: { proposal: LOIProposal; index: numbe
 
 export default function DemoPage() {
   const router = useRouter()
-  const { state, start, reset } = useNegotiation()
+  const { state, start, approveCheckpoint, rejectCheckpoint, reset } = useNegotiation()
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -75,6 +75,7 @@ export default function DemoPage() {
   const gap = latestSeller && latestBuyer ? latestSeller.purchasePrice - latestBuyer.purchasePrice : null
   const isDone = state.status === "agreed" || state.status === "complete"
   const isAgreed = state.status === "agreed"
+  const isCheckpoint = state.status === "checkpoint"
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -214,6 +215,35 @@ export default function DemoPage() {
                     </div>
                     <div className="text-center text-xs text-muted-foreground mt-1">
                       {state.convergenceHistory[state.convergenceHistory.length - 1]?.score || 0}%
+                    </div>
+                  </div>
+                )}
+
+                {isCheckpoint && (
+                  <div className="bg-amber-500/10 border border-amber-500/40 rounded-2xl p-4 shadow-sm">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+                      <span className="text-xs font-semibold text-amber-600 uppercase tracking-wide">Human Approval Required</span>
+                    </div>
+                    {state.checkpointReason && (
+                      <p className="text-xs text-foreground/80 mb-3 leading-relaxed">{state.checkpointReason}</p>
+                    )}
+                    <div className="space-y-2">
+                      <Button
+                        size="sm"
+                        onClick={approveCheckpoint}
+                        className="w-full bg-amber-500 hover:bg-amber-400 text-white gap-1.5 text-xs rounded-full"
+                      >
+                        <CheckCircle className="h-3 w-3" /> Approve &amp; Continue
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={rejectCheckpoint}
+                        className="w-full border-border text-foreground hover:bg-secondary gap-1.5 text-xs rounded-full"
+                      >
+                        End Negotiation
+                      </Button>
                     </div>
                   </div>
                 )}
